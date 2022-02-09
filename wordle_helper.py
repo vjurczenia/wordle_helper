@@ -69,14 +69,10 @@ def wordle_guess(possible_answers, guess, colors_list):
     return post_green_possible_answers
 
 
-def next_best_guess(possible_answers):
+def get_words_sorted_by_unique_letter_count_sum(possible_answers):
     # count all occurences of letters in possible answers
     # sum counts of unique letters per word
     # sort
-
-    # this is kind of opinionated though
-    # maybe it should just get the count sum once
-    # and use that each time instead of recalculating
 
     total_letter_count = {}
     for word in possible_answers:
@@ -93,17 +89,19 @@ def next_best_guess(possible_answers):
             letter_count_sum += total_letter_count[letter]
         word_letter_count_sum[word] = letter_count_sum
 
-    words_sorted_by_letter_count_sum = sorted(
+    words_sorted_by_unique_letter_count_sum = sorted(
         word_letter_count_sum, key=word_letter_count_sum.get, reverse=True
     )
 
-    return words_sorted_by_letter_count_sum
+    return words_sorted_by_unique_letter_count_sum
 
 
 def input_loop():
     new_possible_answers = wordle.possible_answers
-    while True:
-        print(next_best_guess(new_possible_answers)[:10])
+    words_sorted_by_unique_letter_count_sum = get_words_sorted_by_unique_letter_count_sum(new_possible_answers)
+    while len(new_possible_answers) > 1:
+        print('Suggested next guesses:')
+        print([x for x in words_sorted_by_unique_letter_count_sum if x in new_possible_answers][:10])
 
         guess = ''
         while len(guess) != 5:
@@ -115,7 +113,9 @@ def input_loop():
         
         new_possible_answers = wordle_guess(new_possible_answers, guess, colors_list)
 
+        print('Remaining possible answers:')
         print(new_possible_answers)
+        print('')
 
 
 def main():
